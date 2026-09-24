@@ -1,0 +1,61 @@
+model,category,threshold_mm,hits,misses,false_alarms,CSI,POD,FAR,ETS,metric_type,neighborhood_cells,approximate_scale_km,FSS
+Raw GEFS,Heavy,64.5,64.0,1064.0,1241.0,0.027015618404390037,0.05673758865248227,0.9509578544061302,0.018948364422740845,categorical,,,
+Raw GEFS,Very Heavy,115.6,0.0,145.0,161.0,0.0,0.0,1.0,-0.0010106259668751052,categorical,,,
+Raw GEFS,Extremely Heavy,204.5,0.0,11.0,3.0,0.0,0.0,1.0,-3.119455286389628e-05,categorical,,,
+Additive,Heavy,64.5,45.0,1083.0,957.0,0.02158273381294964,0.0398936170212766,0.9550898203592815,0.014513034224576346,categorical,,,
+Additive,Very Heavy,115.6,0.0,145.0,140.0,0.0,0.0,1.0,-0.0009434959779417146,categorical,,,
+Additive,Extremely Heavy,204.5,0.0,11.0,3.0,0.0,0.0,1.0,-3.119455286389628e-05,categorical,,,
+Linear Regression,Heavy,64.5,0.0,1128.0,5.0,0.0,0.0,1.0,-6.588053511114215e-05,categorical,,,
+Linear Regression,Very Heavy,115.6,0.0,145.0,0.0,0.0,0.0,,0.0,categorical,,,
+Linear Regression,Extremely Heavy,204.5,0.0,11.0,0.0,0.0,0.0,,0.0,categorical,,,
+Gradient Boosting,Heavy,64.5,44.0,1084.0,225.0,0.032520325203252036,0.03900709219858156,0.8364312267657993,0.029640437280983315,categorical,,,
+Gradient Boosting,Very Heavy,115.6,0.0,145.0,4.0,0.0,0.0,1.0,-5.151615142373322e-05,categorical,,,
+Gradient Boosting,Extremely Heavy,204.5,0.0,11.0,0.0,0.0,0.0,,0.0,categorical,,,
+Raw GEFS,Heavy,64.5,,,,,,,,FSS,1.0,25.0,0.05260994656802298
+Raw GEFS,Heavy,64.5,,,,,,,,FSS,3.0,75.0,0.08561059706609797
+Raw GEFS,Heavy,64.5,,,,,,,,FSS,5.0,125.0,0.11099240626579432
+Raw GEFS,Heavy,64.5,,,,,,,,FSS,9.0,225.0,0.1605964385300911
+Raw GEFS,Very Heavy,115.6,,,,,,,,FSS,1.0,25.0,0.0
+Raw GEFS,Very Heavy,115.6,,,,,,,,FSS,3.0,75.0,0.0
+Raw GEFS,Very Heavy,115.6,,,,,,,,FSS,5.0,125.0,0.0
+Raw GEFS,Very Heavy,115.6,,,,,,,,FSS,9.0,225.0,0.0015884549421061323
+Raw GEFS,Extremely Heavy,204.5,,,,,,,,FSS,1.0,25.0,0.0
+Raw GEFS,Extremely Heavy,204.5,,,,,,,,FSS,3.0,75.0,0.0
+Raw GEFS,Extremely Heavy,204.5,,,,,,,,FSS,5.0,125.0,0.0
+Raw GEFS,Extremely Heavy,204.5,,,,,,,,FSS,9.0,225.0,0.0
+Additive,Heavy,64.5,,,,,,,,FSS,1.0,25.0,0.04225352112676062
+Additive,Heavy,64.5,,,,,,,,FSS,3.0,75.0,0.06805356564853116
+Additive,Heavy,64.5,,,,,,,,FSS,5.0,125.0,0.08915519581171494
+Additive,Heavy,64.5,,,,,,,,FSS,9.0,225.0,0.12936317101371075
+Additive,Very Heavy,115.6,,,,,,,,FSS,1.0,25.0,0.0
+Additive,Very Heavy,115.6,,,,,,,,FSS,3.0,75.0,0.0
+Additive,Very Heavy,115.6,,,,,,,,FSS,5.0,125.0,0.0
+Additive,Very Heavy,115.6,,,,,,,,FSS,9.0,225.0,0.001786408102002368
+Additive,Extremely Heavy,204.5,,,,,,,,FSS,1.0,25.0,0.0
+Additive,Extremely Heavy,204.5,,,,,,,,FSS,3.0,75.0,0.0
+Additive,Extremely Heavy,204.5,,,,,,,,FSS,5.0,125.0,0.0
+Additive,Extremely Heavy,204.5,,,,,,,,FSS,9.0,225.0,0.0
+Linear Regression,Heavy,64.5,,,,,,,,FSS,1.0,25.0,0.0
+Linear Regression,Heavy,64.5,,,,,,,,FSS,3.0,75.0,0.0
+Linear Regression,Heavy,64.5,,,,,,,,FSS,5.0,125.0,7.89736857668144e-05
+Linear Regression,Heavy,64.5,,,,,,,,FSS,9.0,225.0,9.036332065803787e-05
+Linear Regression,Very Heavy,115.6,,,,,,,,FSS,1.0,25.0,0.0
+Linear Regression,Very Heavy,115.6,,,,,,,,FSS,3.0,75.0,0.0
+Linear Regression,Very Heavy,115.6,,,,,,,,FSS,5.0,125.0,0.0
+Linear Regression,Very Heavy,115.6,,,,,,,,FSS,9.0,225.0,0.0
+Linear Regression,Extremely Heavy,204.5,,,,,,,,FSS,1.0,25.0,0.0
+Linear Regression,Extremely Heavy,204.5,,,,,,,,FSS,3.0,75.0,0.0
+Linear Regression,Extremely Heavy,204.5,,,,,,,,FSS,5.0,125.0,0.0
+Linear Regression,Extremely Heavy,204.5,,,,,,,,FSS,9.0,225.0,0.0
+Gradient Boosting,Heavy,64.5,,,,,,,,FSS,1.0,25.0,0.06299212598425197
+Gradient Boosting,Heavy,64.5,,,,,,,,FSS,3.0,75.0,0.1044112312268739
+Gradient Boosting,Heavy,64.5,,,,,,,,FSS,5.0,125.0,0.12787042409239113
+Gradient Boosting,Heavy,64.5,,,,,,,,FSS,9.0,225.0,0.16352069743512043
+Gradient Boosting,Very Heavy,115.6,,,,,,,,FSS,1.0,25.0,0.0
+Gradient Boosting,Very Heavy,115.6,,,,,,,,FSS,3.0,75.0,0.001173249902229223
+Gradient Boosting,Very Heavy,115.6,,,,,,,,FSS,5.0,125.0,0.0035371108493128522
+Gradient Boosting,Very Heavy,115.6,,,,,,,,FSS,9.0,225.0,0.004110146739397136
+Gradient Boosting,Extremely Heavy,204.5,,,,,,,,FSS,1.0,25.0,0.0
+Gradient Boosting,Extremely Heavy,204.5,,,,,,,,FSS,3.0,75.0,0.0
+Gradient Boosting,Extremely Heavy,204.5,,,,,,,,FSS,5.0,125.0,0.0
+Gradient Boosting,Extremely Heavy,204.5,,,,,,,,FSS,9.0,225.0,0.0

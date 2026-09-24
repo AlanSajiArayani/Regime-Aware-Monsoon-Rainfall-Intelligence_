@@ -1,0 +1,37 @@
+model,category,threshold_mm,neighbourhood_cells,approximate_scale_km,FSS
+Raw GEFS,Heavy,64.5,1,25,0.05260994656802298
+Raw GEFS,Heavy,64.5,3,75,0.08561059706609797
+Raw GEFS,Heavy,64.5,5,125,0.11099240626579432
+Raw GEFS,Heavy,64.5,9,225,0.1605964385300911
+Raw GEFS,Very Heavy,115.6,1,25,0.0
+Raw GEFS,Very Heavy,115.6,3,75,0.0
+Raw GEFS,Very Heavy,115.6,5,125,0.0
+Raw GEFS,Very Heavy,115.6,9,225,0.0015884549421061323
+Raw GEFS,Extremely Heavy,204.5,1,25,0.0
+Raw GEFS,Extremely Heavy,204.5,3,75,0.0
+Raw GEFS,Extremely Heavy,204.5,5,125,0.0
+Raw GEFS,Extremely Heavy,204.5,9,225,0.0
+Global correction,Heavy,64.5,1,25,0.042233693101830116
+Global correction,Heavy,64.5,3,75,0.06809583858764179
+Global correction,Heavy,64.5,5,125,0.08929252355896178
+Global correction,Heavy,64.5,9,225,0.12954871007849633
+Global correction,Very Heavy,115.6,1,25,0.0
+Global correction,Very Heavy,115.6,3,75,0.0
+Global correction,Very Heavy,115.6,5,125,0.0
+Global correction,Very Heavy,115.6,9,225,0.001786408102002368
+Global correction,Extremely Heavy,204.5,1,25,0.0
+Global correction,Extremely Heavy,204.5,3,75,0.0
+Global correction,Extremely Heavy,204.5,5,125,0.0
+Global correction,Extremely Heavy,204.5,9,225,0.0
+Regime-aware correction,Heavy,64.5,1,25,0.04315196998123827
+Regime-aware correction,Heavy,64.5,3,75,0.06864392560110377
+Regime-aware correction,Heavy,64.5,5,125,0.08968443476557186
+Regime-aware correction,Heavy,64.5,9,225,0.12959689911483907
+Regime-aware correction,Very Heavy,115.6,1,25,0.0
+Regime-aware correction,Very Heavy,115.6,3,75,0.0
+Regime-aware correction,Very Heavy,115.6,5,125,0.0
+Regime-aware correction,Very Heavy,115.6,9,225,0.001786408102002368
+Regime-aware correction,Extremely Heavy,204.5,1,25,0.0
+Regime-aware correction,Extremely Heavy,204.5,3,75,0.0
+Regime-aware correction,Extremely Heavy,204.5,5,125,0.0
+Regime-aware correction,Extremely Heavy,204.5,9,225,0.0

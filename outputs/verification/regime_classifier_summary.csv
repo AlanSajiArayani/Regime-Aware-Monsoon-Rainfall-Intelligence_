@@ -1,0 +1,2 @@
+accuracy,balanced_accuracy,macro_f1,correct_days,total_days
+0.5483870967741935,0.6088564213564214,0.5826408885232415,17,31

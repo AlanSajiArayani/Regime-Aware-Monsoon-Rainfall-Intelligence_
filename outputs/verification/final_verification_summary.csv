@@ -1,0 +1,8 @@
+component,metric,value,scope
+Regime classifier,Balanced accuracy,0.6088564213564214,31 July 2018 days
+Regime-aware correction,31-day RMSE,19.2833,Four-fold out-of-fold
+Raw GEFS,31-day RMSE,20.3831,Four-fold out-of-fold
+Heavy probability model,ROC-AUC,0.909883478027066,27–31 July 2018
+Heavy probability model,CSI,0.0945072697899838,27–31 July 2018
+Heavy probability model,POD,0.2074468085106383,27–31 July 2018
+Heavy probability model,FAR,0.8520859671302149,27–31 July 2018

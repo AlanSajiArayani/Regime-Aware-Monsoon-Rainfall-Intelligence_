@@ -1,0 +1,20 @@
+{
+  "model_name": "Random Forest",
+  "features": [
+    "central_gefs_rain",
+    "regional_min_mslp",
+    "regional_mean_mslp",
+    "monsoon_q850",
+    "monsoon_wind_speed",
+    "arabian_sea_u850"
+  ],
+  "classes": [
+    "Active",
+    "Break",
+    "Low/Depression",
+    "Normal"
+  ],
+  "training_period": "2018-07-01 to 2018-07-31",
+  "label_type": "prototype hybrid rule-based labels",
+  "limitations": "Only 31 dates; not operationally validated"
+}
