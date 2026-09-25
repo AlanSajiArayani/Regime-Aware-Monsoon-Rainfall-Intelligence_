@@ -14,6 +14,114 @@ st.set_page_config(
 )
 
 
+st.markdown(
+    """
+    <style>
+    /* Keep the dashboard comfortable on laptops without wasting space. */
+    .block-container {
+        max-width: 1500px;
+        padding-top: 1.4rem;
+        padding-bottom: 2rem;
+    }
+
+    [data-testid="stMetric"] {
+        padding: 0.75rem 0.9rem;
+        border: 1px solid rgba(128, 128, 128, 0.18);
+        border-radius: 0.75rem;
+        background: rgba(128, 128, 128, 0.04);
+        min-height: 7.25rem;
+    }
+
+    [data-testid="stMetricLabel"] {
+        min-height: 2.7rem;
+        align-items: flex-start;
+    }
+
+    [data-testid="stMetricValue"] {
+        font-size: clamp(1.55rem, 2.3vw, 2.35rem);
+    }
+
+    /* Let wide dataframes scroll instead of squeezing their contents. */
+    [data-testid="stDataFrame"] {
+        overflow-x: auto;
+    }
+
+    @media (max-width: 768px) {
+        .block-container {
+            padding: 0.75rem 0.8rem 1.5rem;
+        }
+
+        h1 {
+            font-size: 1.75rem !important;
+            line-height: 1.15 !important;
+        }
+
+        h2, h3 {
+            font-size: 1.35rem !important;
+            line-height: 1.2 !important;
+        }
+
+        div[data-testid="stAlert"] {
+            padding: 0.75rem;
+        }
+
+        .st-key-primary_metrics [data-testid="stHorizontalBlock"],
+        .st-key-trust_metrics [data-testid="stHorizontalBlock"] {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            gap: 0.55rem;
+        }
+
+        .st-key-primary_metrics [data-testid="column"],
+        .st-key-trust_metrics [data-testid="column"] {
+            flex: 1 1 calc(50% - 0.55rem) !important;
+            width: calc(50% - 0.55rem) !important;
+            min-width: 0 !important;
+        }
+
+        [data-testid="stMetric"] {
+            padding: 0.65rem 0.7rem;
+            min-height: 6.4rem;
+        }
+
+        [data-testid="stMetricLabel"] {
+            min-height: 2.35rem;
+            font-size: 0.82rem;
+            line-height: 1.15;
+        }
+
+        [data-testid="stMetricValue"] {
+            font-size: 1.45rem;
+        }
+
+        [data-testid="stMetricDelta"] {
+            font-size: 0.75rem;
+        }
+
+        /* Avoid an oversized gap above Plotly charts on narrow screens. */
+        [data-testid="stPlotlyChart"] {
+            margin-top: -0.25rem;
+        }
+
+        .stDownloadButton button {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 390px) {
+        .st-key-primary_metrics [data-testid="column"],
+        .st-key-trust_metrics [data-testid="column"] {
+            flex-basis: 100% !important;
+            width: 100% !important;
+        }
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 BOUNDARY_FILE = (
@@ -212,6 +320,14 @@ st.caption(
     "geographic context and regime-aware AI correction."
 )
 
+st.info(
+    "Scope: the research evaluation uses all 31 days of "
+    "July 2018 at grid level. This dashboard packages only "
+    "27–31 July 2018 as a five-day, district-level MVP "
+    "demonstration. The dashboard dates are not presented "
+    "as an independent test set."
+)
+
 
 available_dates = sorted(
     forecast_df["date"].dt.date.unique()
@@ -308,33 +424,34 @@ average_corrected = float(
 )
 
 
-metric_1, metric_2, metric_3, metric_4 = (
-    st.columns(4)
-)
+with st.container(key="primary_metrics"):
+    metric_1, metric_2, metric_3, metric_4 = (
+        st.columns(4, gap="small")
+    )
 
-metric_1.metric(
-    "Districts",
-    f"{selected_data['shapeID'].nunique():,}",
-)
+    metric_1.metric(
+        "Districts",
+        f"{selected_data['shapeID'].nunique():,}",
+    )
 
-metric_2.metric(
-    "Experimental watches",
-    f"{watch_count:,}",
-)
+    metric_2.metric(
+        "Experimental watches",
+        f"{watch_count:,}",
+    )
 
-metric_3.metric(
-    "Maximum heavy probability",
-    f"{maximum_probability:.1%}",
-)
+    metric_3.metric(
+        "Maximum heavy probability",
+        f"{maximum_probability:.1%}",
+    )
 
-metric_4.metric(
-    "Average corrected rainfall",
-    f"{average_corrected:.1f} mm",
-    delta=(
-        f"{average_corrected - average_raw:.1f} mm"
-    ),
-    delta_color="off",
-)
+    metric_4.metric(
+        "Average corrected rainfall",
+        f"{average_corrected:.1f} mm",
+        delta=(
+            f"{average_corrected - average_raw:.1f} mm"
+        ),
+        delta_color="off",
+    )
 
 
 if trust_columns_available:
@@ -359,24 +476,25 @@ if trust_columns_available:
         ].mean()
     )
 
-    trust_metric_1, trust_metric_2, trust_metric_3 = (
-        st.columns(3)
-    )
+    with st.container(key="trust_metrics"):
+        trust_metric_1, trust_metric_2, trust_metric_3 = (
+            st.columns(3, gap="small")
+        )
 
-    trust_metric_1.metric(
-        "Elevated-disagreement districts",
-        f"{elevated_count:,}",
-    )
+        trust_metric_1.metric(
+            "Elevated-disagreement districts",
+            f"{elevated_count:,}",
+        )
 
-    trust_metric_2.metric(
-        "Mean observation confidence",
-        f"{mean_observation_confidence:.1%}",
-    )
+        trust_metric_2.metric(
+            "Mean observation confidence",
+            f"{mean_observation_confidence:.1%}",
+        )
 
-    trust_metric_3.metric(
-        "Mean low-confidence fraction",
-        f"{mean_low_confidence_fraction:.1%}",
-    )
+        trust_metric_3.metric(
+            "Mean low-confidence fraction",
+            f"{mean_low_confidence_fraction:.1%}",
+        )
 
 
 st.subheader("District forecast map")
@@ -488,14 +606,10 @@ with st.spinner("Preparing district map..."):
             "lat": 22.5,
             "lon": 79.0,
         },
-        "zoom": 3.3,
+        "zoom": 3.0,
         "opacity": 0.80,
         "map_style": "carto-positron",
-        "title": (
-            f"{selected_layer} — "
-            f"{selected_date:%d %B %Y}"
-        ),
-        "height": 720,
+        "height": 680,
     }
 
     if settings.get("kind") == "categorical":
@@ -519,11 +633,37 @@ with st.spinner("Preparing district map..."):
         margin={
             "l": 0,
             "r": 0,
-            "t": 50,
-            "b": 0,
+            "t": 8,
+            "b": 86,
+        },
+        coloraxis_colorbar={
+            "orientation": "h",
+            "x": 0.5,
+            "xanchor": "center",
+            "y": -0.08,
+            "yanchor": "top",
+            "len": 0.82,
+            "thickness": 14,
+            "title": {
+                "side": "top",
+                "text": settings["label"],
+            },
+        },
+        legend={
+            "orientation": "h",
+            "x": 0.0,
+            "xanchor": "left",
+            "y": -0.08,
+            "yanchor": "top",
+            "title": {"text": ""},
         },
     )
 
+
+st.caption(
+    f"{selected_layer} — "
+    f"{selected_date:%d %B %Y}"
+)
 
 st.plotly_chart(
     figure,
@@ -531,13 +671,16 @@ st.plotly_chart(
     theme=None,
     config={
         "displaylogo": False,
-        "scrollZoom": True,
+        "displayModeBar": False,
+        "scrollZoom": False,
+        "responsive": True,
     },
 )
 
 
 left_column, right_column = st.columns(
-    [1, 1]
+    [1, 1],
+    gap="large",
 )
 
 
@@ -698,7 +841,8 @@ if trust_columns_available:
     )
 
     reliability_left, reliability_right = st.columns(
-        [1, 2]
+        [1, 2],
+        gap="large",
     )
 
     with reliability_left:
@@ -970,7 +1114,7 @@ st.download_button(
 
 if trust_columns_available:
     with st.expander(
-        "RAIN-Trust research findings"
+        "Study-wide RAIN-Trust findings — July 2018"
     ):
         st.markdown(
             """
@@ -985,7 +1129,7 @@ if trust_columns_available:
 
 
 with st.expander(
-    "Model verification and limitations"
+    "Study-wide model verification and limitations"
 ):
     st.markdown(
         """
