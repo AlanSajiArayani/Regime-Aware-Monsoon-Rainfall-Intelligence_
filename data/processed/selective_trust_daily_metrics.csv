@@ -1,0 +1,187 @@
+date,scope,model,samples,RMSE,MAE,absolute_bias
+2018-07-01,Overall,Regime correction,4632,24.48214,9.798944,3.5071
+2018-07-01,Overall,Selective trust raw,4632,24.946493,10.11387,4.0644746
+2018-07-01,Coastal plain,Regime correction,479,12.172535,6.0328574,4.2210884
+2018-07-01,Coastal plain,Selective trust raw,479,12.080776,5.9859304,4.0127497
+2018-07-01,Coastal orographic,Regime correction,102,12.483902,6.953034,6.5028687
+2018-07-01,Coastal orographic,Selective trust raw,102,12.033677,6.532431,5.978274
+2018-07-02,Overall,Regime correction,4632,21.804888,10.64627,3.0971553
+2018-07-02,Overall,Selective trust raw,4632,22.218014,10.940412,3.7161605
+2018-07-02,Coastal plain,Regime correction,479,12.386011,6.645393,2.1926036
+2018-07-02,Coastal plain,Selective trust raw,479,12.590802,6.858842,2.6730256
+2018-07-02,Coastal orographic,Regime correction,102,13.104623,8.628086,1.7836285
+2018-07-02,Coastal orographic,Selective trust raw,102,13.359535,8.890626,2.548438
+2018-07-03,Overall,Regime correction,4632,21.150295,12.081619,1.843855
+2018-07-03,Overall,Selective trust raw,4632,21.278788,12.217675,2.5248172
+2018-07-03,Coastal plain,Regime correction,479,19.83199,12.498598,2.0408444
+2018-07-03,Coastal plain,Selective trust raw,479,19.997868,12.567089,1.128299
+2018-07-03,Coastal orographic,Regime correction,102,16.879387,10.866276,3.9846087
+2018-07-03,Coastal orographic,Selective trust raw,102,16.716637,10.777888,3.076995
+2018-07-04,Overall,Regime correction,4632,20.078836,10.136235,1.9090488
+2018-07-04,Overall,Selective trust raw,4632,20.14036,10.336824,2.4821768
+2018-07-04,Coastal plain,Regime correction,479,17.448519,9.498367,1.6291372
+2018-07-04,Coastal plain,Selective trust raw,479,17.59754,9.80347,0.8467491
+2018-07-04,Coastal orographic,Regime correction,102,12.626848,7.710692,1.0885428
+2018-07-04,Coastal orographic,Selective trust raw,102,12.740399,7.80135,1.7943976
+2018-07-05,Overall,Regime correction,4632,15.159076,7.7610946,0.084363185
+2018-07-05,Overall,Selective trust raw,4632,15.427541,7.9748697,0.47468647
+2018-07-05,Coastal plain,Regime correction,479,18.276005,8.586539,6.134327
+2018-07-05,Coastal plain,Selective trust raw,479,18.213404,8.737341,5.6431904
+2018-07-05,Coastal orographic,Regime correction,102,24.053701,11.20357,5.6964808
+2018-07-05,Coastal orographic,Selective trust raw,102,23.929892,11.178551,5.17296
+2018-07-06,Overall,Regime correction,4632,15.345748,7.61289,0.348331
+2018-07-06,Overall,Selective trust raw,4632,15.369622,7.6815023,0.71999925
+2018-07-06,Coastal plain,Regime correction,479,15.907193,7.5733705,2.847753
+2018-07-06,Coastal plain,Selective trust raw,479,15.968764,7.681346,2.3607242
+2018-07-06,Coastal orographic,Regime correction,102,35.943584,16.419905,12.696894
+2018-07-06,Coastal orographic,Selective trust raw,102,35.802975,16.418915,12.331511
+2018-07-07,Overall,Regime correction,4632,18.810549,8.228223,0.21021815
+2018-07-07,Overall,Selective trust raw,4632,18.855776,8.425071,0.6976535
+2018-07-07,Coastal plain,Regime correction,479,25.829948,12.783053,3.4348445
+2018-07-07,Coastal plain,Selective trust raw,479,25.727894,12.8620825,2.7881236
+2018-07-07,Coastal orographic,Regime correction,102,51.902683,31.419712,19.477169
+2018-07-07,Coastal orographic,Selective trust raw,102,51.61416,31.282925,18.838943
+2018-07-08,Overall,Regime correction,4632,18.145418,8.144389,0.0815932
+2018-07-08,Overall,Selective trust raw,4632,18.35841,8.295968,0.52806157
+2018-07-08,Coastal plain,Regime correction,479,32.33457,14.633083,9.549786
+2018-07-08,Coastal plain,Selective trust raw,479,32.157402,14.49216,9.200491
+2018-07-08,Coastal orographic,Regime correction,102,47.404316,30.483332,17.50376
+2018-07-08,Coastal orographic,Selective trust raw,102,47.21251,30.52185,16.891867
+2018-07-09,Overall,Regime correction,4632,16.565071,8.028557,0.49988225
+2018-07-09,Overall,Selective trust raw,4632,16.665714,8.190936,1.0394747
+2018-07-09,Coastal plain,Regime correction,479,25.845966,10.272773,2.048734
+2018-07-09,Coastal plain,Selective trust raw,479,25.86535,10.393456,1.6224421
+2018-07-09,Coastal orographic,Regime correction,102,27.340464,20.043215,7.651195
+2018-07-09,Coastal orographic,Selective trust raw,102,27.115412,19.988592,7.087014
+2018-07-10,Overall,Regime correction,4632,21.429125,11.638542,3.2119086
+2018-07-10,Overall,Selective trust raw,4632,22.081783,12.044612,3.8490634
+2018-07-10,Coastal plain,Regime correction,479,30.980064,17.669981,4.395496
+2018-07-10,Coastal plain,Selective trust raw,479,31.79943,18.24295,5.363347
+2018-07-10,Coastal orographic,Regime correction,102,34.082806,22.067703,12.985932
+2018-07-10,Coastal orographic,Selective trust raw,102,34.128582,22.271372,12.312562
+2018-07-11,Overall,Regime correction,4632,21.259827,11.765781,2.8851628
+2018-07-11,Overall,Selective trust raw,4632,21.62587,12.143243,3.747705
+2018-07-11,Coastal plain,Regime correction,479,20.984684,12.873682,0.6701321
+2018-07-11,Coastal plain,Selective trust raw,479,21.370712,13.280875,0.40775818
+2018-07-11,Coastal orographic,Regime correction,102,33.628742,22.34758,19.842564
+2018-07-11,Coastal orographic,Selective trust raw,102,33.375237,22.42105,19.301777
+2018-07-12,Overall,Regime correction,4632,22.977198,13.796712,1.4097991
+2018-07-12,Overall,Selective trust raw,4632,23.125456,13.941546,2.3791697
+2018-07-12,Coastal plain,Regime correction,479,26.392256,15.474354,5.662681
+2018-07-12,Coastal plain,Selective trust raw,479,25.747713,15.079495,4.689587
+2018-07-12,Coastal orographic,Regime correction,102,33.885143,24.627237,18.794458
+2018-07-12,Coastal orographic,Selective trust raw,102,33.592598,24.419039,18.332748
+2018-07-13,Overall,Regime correction,4632,22.688667,13.442869,1.7005801
+2018-07-13,Overall,Selective trust raw,4632,22.92152,13.706465,2.5318158
+2018-07-13,Coastal plain,Regime correction,479,30.79714,15.618413,7.140351
+2018-07-13,Coastal plain,Selective trust raw,479,30.374994,15.439633,6.4004617
+2018-07-13,Coastal orographic,Regime correction,102,30.911018,20.31695,7.7571425
+2018-07-13,Coastal orographic,Selective trust raw,102,30.552725,20.328924,6.620337
+2018-07-14,Overall,Regime correction,4632,17.076138,10.283388,0.03893848
+2018-07-14,Overall,Selective trust raw,4632,17.097956,10.419375,0.7341894
+2018-07-14,Coastal plain,Regime correction,479,23.149965,12.75709,0.4323898
+2018-07-14,Coastal plain,Selective trust raw,479,23.178976,13.074773,0.74515766
+2018-07-14,Coastal orographic,Regime correction,102,25.693115,18.24146,11.346582
+2018-07-14,Coastal orographic,Selective trust raw,102,24.649632,17.50687,10.100461
+2018-07-15,Overall,Regime correction,4632,25.108782,13.99493,5.213071
+2018-07-15,Overall,Selective trust raw,4632,25.765486,14.4187565,6.1975713
+2018-07-15,Coastal plain,Regime correction,479,36.95199,22.358038,1.507746
+2018-07-15,Coastal plain,Selective trust raw,479,37.127007,22.659477,2.94959
+2018-07-15,Coastal orographic,Regime correction,102,42.927994,28.959587,4.8112774
+2018-07-15,Coastal orographic,Selective trust raw,102,43.129917,29.430033,6.6183276
+2018-07-16,Overall,Regime correction,4632,27.16368,15.174975,3.0775936
+2018-07-16,Overall,Selective trust raw,4632,27.50179,15.663344,4.238414
+2018-07-16,Coastal plain,Regime correction,479,38.628914,22.4469,11.095676
+2018-07-16,Coastal plain,Selective trust raw,479,37.9928,22.176569,9.63203
+2018-07-16,Coastal orographic,Regime correction,102,46.39235,32.69414,2.1498353
+2018-07-16,Coastal orographic,Selective trust raw,102,46.792698,33.133118,0.7187583
+2018-07-17,Overall,Regime correction,4632,26.61122,15.0880995,0.25866267
+2018-07-17,Overall,Selective trust raw,4632,26.802965,15.255102,0.2879587
+2018-07-17,Coastal plain,Regime correction,479,43.26508,22.440994,13.460192
+2018-07-17,Coastal plain,Selective trust raw,479,43.144802,22.345749,12.951379
+2018-07-17,Coastal orographic,Regime correction,102,30.855057,20.863602,6.8355393
+2018-07-17,Coastal orographic,Selective trust raw,102,30.80835,20.859161,5.652843
+2018-07-18,Overall,Regime correction,4632,23.596725,11.8221245,1.5214336
+2018-07-18,Overall,Selective trust raw,4632,23.864473,12.026995,2.0609007
+2018-07-18,Coastal plain,Regime correction,479,40.318626,17.782465,11.410334
+2018-07-18,Coastal plain,Selective trust raw,479,39.64584,17.558521,10.8346405
+2018-07-18,Coastal orographic,Regime correction,102,23.356834,13.899536,6.2866116
+2018-07-18,Coastal orographic,Selective trust raw,102,22.86511,13.634606,5.2518196
+2018-07-19,Overall,Regime correction,4632,21.372877,9.656739,3.682017
+2018-07-19,Overall,Selective trust raw,4632,21.865013,9.946745,4.2248583
+2018-07-19,Coastal plain,Regime correction,479,20.028975,11.796043,2.4055285
+2018-07-19,Coastal plain,Selective trust raw,479,20.507376,12.291903,3.1998503
+2018-07-19,Coastal orographic,Regime correction,102,25.948324,15.660324,5.9459724
+2018-07-19,Coastal orographic,Selective trust raw,102,26.025116,15.628901,7.099203
+2018-07-20,Overall,Regime correction,4632,29.545858,14.235154,7.098286
+2018-07-20,Overall,Selective trust raw,4632,30.298462,14.798828,8.240398
+2018-07-20,Coastal plain,Regime correction,479,16.33482,10.072094,0.50051737
+2018-07-20,Coastal plain,Selective trust raw,479,16.770697,10.230071,1.8229587
+2018-07-20,Coastal orographic,Regime correction,102,20.968414,14.509148,4.653172
+2018-07-20,Coastal orographic,Selective trust raw,102,20.69622,14.445076,2.921269
+2018-07-21,Overall,Regime correction,4632,30.459116,17.334019,7.4212475
+2018-07-21,Overall,Selective trust raw,4632,30.887285,17.686548,8.497782
+2018-07-21,Coastal plain,Regime correction,479,29.251734,13.918929,7.3343353
+2018-07-21,Coastal plain,Selective trust raw,479,28.567957,13.614741,6.2802076
+2018-07-21,Coastal orographic,Regime correction,102,34.324085,21.410458,12.906033
+2018-07-21,Coastal orographic,Selective trust raw,102,33.524487,20.843386,10.978895
+2018-07-22,Overall,Regime correction,4632,34.738186,19.030426,4.251084
+2018-07-22,Overall,Selective trust raw,4632,35.086967,19.41745,5.3787103
+2018-07-22,Coastal plain,Regime correction,479,27.099697,14.637041,6.6606383
+2018-07-22,Coastal plain,Selective trust raw,479,26.725492,14.325783,6.1377754
+2018-07-22,Coastal orographic,Regime correction,102,25.862303,17.080395,2.4413803
+2018-07-22,Coastal orographic,Selective trust raw,102,25.819897,17.105453,0.95257413
+2018-07-23,Overall,Regime correction,4632,20.834597,12.67045,1.1165906
+2018-07-23,Overall,Selective trust raw,4632,21.208097,12.997081,1.9644223
+2018-07-23,Coastal plain,Regime correction,479,16.948046,8.495386,0.31700534
+2018-07-23,Coastal plain,Selective trust raw,479,17.391304,8.77347,0.29013336
+2018-07-23,Coastal orographic,Regime correction,102,14.342525,8.774772,0.34374663
+2018-07-23,Coastal orographic,Selective trust raw,102,14.686024,9.067516,1.0274986
+2018-07-24,Overall,Regime correction,4632,22.736336,12.130322,1.9946761
+2018-07-24,Overall,Selective trust raw,4632,23.167671,12.383783,2.5946522
+2018-07-24,Coastal plain,Regime correction,479,11.715254,5.32118,1.7326349
+2018-07-24,Coastal plain,Selective trust raw,479,11.690084,5.34127,1.4076107
+2018-07-24,Coastal orographic,Regime correction,102,20.256699,12.271624,11.001518
+2018-07-24,Coastal orographic,Selective trust raw,102,19.060904,11.452699,10.145774
+2018-07-25,Overall,Regime correction,4632,27.104359,14.703931,7.6403937
+2018-07-25,Overall,Selective trust raw,4632,28.00016,15.203302,8.674298
+2018-07-25,Coastal plain,Regime correction,479,19.923882,9.705501,2.2497916
+2018-07-25,Coastal plain,Selective trust raw,479,20.796982,10.080372,3.0387485
+2018-07-25,Coastal orographic,Regime correction,102,23.055006,14.405313,10.981463
+2018-07-25,Coastal orographic,Selective trust raw,102,22.061296,13.790108,9.498661
+2018-07-26,Overall,Regime correction,4632,25.145683,13.006514,1.335343
+2018-07-26,Overall,Selective trust raw,4632,25.338348,13.074019,2.105381
+2018-07-26,Coastal plain,Regime correction,479,11.501847,5.5743093,1.3373119
+2018-07-26,Coastal plain,Selective trust raw,479,11.470008,5.5379553,0.5832006
+2018-07-26,Coastal orographic,Regime correction,102,13.486549,8.081297,5.771169
+2018-07-26,Coastal orographic,Selective trust raw,102,12.418561,7.5519342,4.338382
+2018-07-27,Overall,Regime correction,4632,18.804993,8.700063,0.7802074
+2018-07-27,Overall,Selective trust raw,4632,18.616224,8.568334,0.32154357
+2018-07-27,Coastal plain,Regime correction,479,8.079172,3.2086847,2.4850962
+2018-07-27,Coastal plain,Selective trust raw,479,7.597644,3.0448635,2.1668303
+2018-07-27,Coastal orographic,Regime correction,102,5.8395634,3.619604,2.4867055
+2018-07-27,Coastal orographic,Selective trust raw,102,5.435869,3.5685687,1.2271053
+2018-07-28,Overall,Regime correction,4632,20.059563,8.933572,2.7825642
+2018-07-28,Overall,Selective trust raw,4632,20.241858,9.035536,3.2862103
+2018-07-28,Coastal plain,Regime correction,479,6.152877,2.7886016,1.9093812
+2018-07-28,Coastal plain,Selective trust raw,479,5.929838,2.6855314,1.6766573
+2018-07-28,Coastal orographic,Regime correction,102,7.247353,4.234793,2.0403855
+2018-07-28,Coastal orographic,Selective trust raw,102,6.6239595,3.8508286,1.0341473
+2018-07-29,Overall,Regime correction,4632,19.591503,8.676758,3.096847
+2018-07-29,Overall,Selective trust raw,4632,20.26657,9.0621,3.787609
+2018-07-29,Coastal plain,Regime correction,479,8.693632,3.6875997,1.6031622
+2018-07-29,Coastal plain,Selective trust raw,479,8.597235,3.690243,1.2598507
+2018-07-29,Coastal orographic,Regime correction,102,15.382268,8.300604,6.1025643
+2018-07-29,Coastal orographic,Selective trust raw,102,14.933032,8.107618,5.504894
+2018-07-30,Overall,Regime correction,4632,16.962675,6.9368677,1.1120553
+2018-07-30,Overall,Selective trust raw,4632,16.988565,6.953087,1.7140304
+2018-07-30,Coastal plain,Regime correction,479,8.108483,2.9746976,2.1803074
+2018-07-30,Coastal plain,Selective trust raw,479,7.852699,2.8991685,1.7815636
+2018-07-30,Coastal orographic,Regime correction,102,5.4431577,3.3945017,1.3687533
+2018-07-30,Coastal orographic,Selective trust raw,102,5.1718554,3.4582582,0.24726339
+2018-07-31,Overall,Regime correction,4632,16.512436,7.013844,0.6308623
+2018-07-31,Overall,Selective trust raw,4632,16.592484,7.0771475,1.3526096
+2018-07-31,Coastal plain,Regime correction,479,14.033053,5.3690214,3.7095737
+2018-07-31,Coastal plain,Selective trust raw,479,13.66893,5.232203,3.1222389
+2018-07-31,Coastal orographic,Regime correction,102,15.223722,8.402857,6.9770513
+2018-07-31,Coastal orographic,Selective trust raw,102,14.851962,8.604157,5.701799

@@ -9,6 +9,8 @@ The system generates:
 - Heavy and very-heavy rainfall probabilities
 - District-level rainfall products
 - Forecast verification reports
+- Independent IMERG–IMD observation-reliability diagnostics
+- Terrain- and coastline-aware confidence features
 - An interactive GIS dashboard
 
 > ⚠️ **Research prototype:** This system currently uses July 2018 data and must not be interpreted as an official weather-warning system.
@@ -35,7 +37,8 @@ This project investigates whether an AI/ML system can:
 3. Improve raw NWP rainfall forecasts.
 4. Estimate heavy-rainfall probabilities.
 5. Generate district-level rainfall products.
-6. Communicate the results through an interactive GIS dashboard.
+6. Test whether IMERG reliability varies with terrain and coastal setting.
+7. Communicate forecast and observation uncertainty separately through an interactive GIS dashboard.
 
 ---
 
@@ -48,6 +51,9 @@ This project investigates whether an AI/ML system can:
 - Compare raw, global-corrected and regime-corrected rainfall.
 - Estimate the probability of operational rainfall thresholds being exceeded.
 - Verify forecasts using deterministic, categorical, spatial and probabilistic metrics.
+- Validate IMERG against independent IMD gridded rainfall.
+- Test whether terrain, coastline and rainfall intensity explain observation disagreement.
+- Quantify uncertainty with temporal cross-validation, spatial-block validation and bootstrap confidence intervals.
 - Produce district-level rainfall maps and tables.
 - Present the results through a deployable Streamlit dashboard.
 
@@ -57,25 +63,29 @@ This project investigates whether an AI/ML system can:
 
 ```mermaid
 flowchart TD
-    A["NOAA GEFSv12 Reforecast"] --> C["Data ingestion"]
-    B["NASA GPM IMERG Final"] --> C
-    C --> D["Preprocessing and quality control"]
-    D --> E["Temporal and spatial alignment"]
-    E --> F["Model-ready gridded dataset"]
+    A["GEFSv12 forecasts"] --> E["Aligned 0.25° grid"]
+    B["IMERG observations"] --> E
+    C["IMD observations"] --> F["RAIN-Trust reliability analysis"]
+    B --> F
+    D["SRTM terrain and coastline"] --> F
 
-    F --> G["Weather-regime classifier"]
-    F --> H["Global bias correction"]
-    G --> I["Regime-aware correction"]
+    E --> G["Regime classification and bias correction"]
+    G --> H["Heavy-rain probability and verification"]
+    H --> I["District aggregation"]
     F --> I
-
-    I --> J["Corrected rainfall forecast"]
-    J --> K["Heavy-rain probability model"]
-    J --> L["Forecast verification"]
-
-    K --> M["District-level aggregation"]
-    L --> M
-    M --> N["Interactive GIS dashboard"]
+    I --> J["Five-day Streamlit MVP"]
 ```
+
+## Research and deployment scope
+
+The project uses two related but different scopes:
+
+| Component | Period | Spatial level | Purpose |
+|---|---|---|---|
+| Research evaluation | 1–31 July 2018 | 0.25° model grid | Correction evaluation, IMERG–IMD reliability research, cross-validation and bootstrap testing |
+| Dashboard deployment | 27–31 July 2018 | 735 districts | Compact five-day MVP demonstration |
+
+The dashboard therefore does **not** claim to display all 31 July dates. Study-wide findings shown in the dashboard are calculated from the complete July research dataset, while maps, cards and district tables respond only to the five packaged deployment dates. The five dashboard dates are not described as an independent test set.
 
 ---
 
@@ -114,6 +124,11 @@ The pipeline generates:
 - Very-heavy-rain probability
 - District-level rainfall statistics
 - Experimental district risk category
+- Observation-confidence score
+- Low-confidence grid-cell fraction
+- Observation-reliability signal
+- Dominant geographic regime
+- Experimental selective-trust diagnostic
 
 ---
 
@@ -162,7 +177,42 @@ Source: [NASA GPM IMERG Final Daily V07](https://disc.gsfc.nasa.gov/datasets/GPM
 
 ---
 
-## 3. Indian Administrative Boundaries
+## 3. IMD daily gridded rainfall
+
+The India Meteorological Department 0.25° daily gridded rainfall product is used as an independent observation reference for RAIN-Trust. The prototype aligns IMD and IMERG to the model grid and retains only common valid India-grid cells.
+
+July validation summary:
+
+| Item | Value |
+|---|---:|
+| IMERG–IMD valid pairs before India mask | 153,822 |
+| India analysis pairs | 143,592 |
+| Pairs excluded by geographic mask | 10,230 |
+
+IMERG and IMD are treated as independent observational products. Neither is assumed to be perfect ground truth.
+
+---
+
+## 4. NASA SRTM terrain
+
+NASA SRTMGL30 elevation is aggregated to the 0.25° model grid to derive:
+
+- Mean elevation
+- Maximum elevation
+- Sub-grid terrain relief
+- Broad-scale terrain slope
+
+These variables support the analysis of observation reliability in orographic regions.
+
+---
+
+## 5. Coastline distance
+
+Distance to the Indian coastline is calculated for each model-grid cell. The prototype uses a 75 km coastal-zone threshold when defining geographic regimes.
+
+---
+
+## 6. Indian Administrative Boundaries
 
 District boundaries are used to convert gridded rainfall forecasts into district-level products.
 
@@ -294,6 +344,37 @@ District output includes:
 
 ---
 
+## 7. RAIN-Trust observation-reliability analysis
+
+RAIN-Trust tests whether an existing observational rainfall product has geographically structured uncertainty. For every common valid IMERG–IMD cell and date, the pipeline calculates rainfall difference, absolute difference and an agreement score:
+
+```text
+agreement = exp(-absolute_difference / (5 + mean_IMERG_IMD_rainfall))
+```
+
+The 5 mm stabilization floor reduces instability at very low rainfall. Sensitivity tests repeat the analysis with 2, 5 and 10 mm floors.
+
+Model-grid cells are grouped into four geographic regimes:
+
+| Code | Geographic regime |
+|---:|---|
+| 0 | Interior plain |
+| 1 | Coastal plain |
+| 2 | Interior orographic |
+| 3 | Coastal orographic |
+
+Research safeguards include:
+
+- Five-fold date-held-out validation
+- Five-fold spatial-block validation across 23 spatial blocks
+- Stabilization-floor sensitivity analysis
+- Date-resampled bootstrap confidence intervals
+- Independent evaluation against both IMERG and IMD
+
+The resulting district product reports observation confidence separately from forecast probability. Low observation confidence is not proof that the forecast is wrong and is not an operational warning.
+
+---
+
 # 📏 Verification Metrics
 
 ## Deterministic metrics
@@ -371,6 +452,53 @@ The high FAR indicates that the probability model currently produces too many fa
 
 ---
 
+## RAIN-Trust research findings
+
+### Geographic-feature model
+
+| Validation design | Model | MAE | RMSE | R² | Macro-regime MAE |
+|---|---|---:|---:|---:|---:|
+| Date-held-out | IMERG intensity baseline | 0.17594 | 0.21282 | 0.33458 | 0.18196 |
+| Date-held-out | IMERG + geographic features | **0.16514** | **0.20731** | **0.36846** | **0.16639** |
+| Spatial-block | IMERG intensity baseline | 0.17596 | 0.21272 | 0.33013 | 0.17703 |
+| Spatial-block | IMERG + geographic features | **0.16803** | **0.21056** | **0.34375** | **0.17054** |
+
+The geographic model retained a smaller advantage under spatial blocking, suggesting that terrain and coastal context contain useful information beyond rainfall intensity alone. The evidence remains preliminary because it covers only one month.
+
+### Bootstrap-supported geographic differences
+
+Relative to interior plains, the coastal-orographic regime showed:
+
+- Agreement-score difference: **−0.0929**, 95% CI **−0.1151 to −0.0702**
+- MAE difference: **+10.17 mm**, 95% CI **+7.54 to +12.95 mm**
+- RMSE difference: **+11.03 mm**, 95% CI **+7.13 to +15.06 mm**
+- Bias difference: **−8.45 mm**, 95% CI **−12.23 to −4.62 mm**
+
+This supports the research hypothesis that observation disagreement is geographically structured, with the strongest reliability challenge in coastal-orographic areas.
+
+### Trust-weighted correction decision
+
+The trust signal was tested as a correction input, not accepted automatically.
+
+| IMD evaluation | RMSE | MAE | Bias |
+|---|---:|---:|---:|
+| Raw GEFS | 23.65497 | 12.80829 | 5.74420 |
+| Global correction | 22.54486 | 11.39171 | 2.33958 |
+| Regime correction | **22.51119** | **11.37014** | **2.30716** |
+| Trust-weighted raw blend | 22.91822 | 11.78989 | 3.62974 |
+| Trust-weighted global blend | 22.52550 | 11.37867 | 2.32105 |
+
+Direct trust blending did not improve the India-wide forecast. A selective raw blend improved coastal-orographic daily RMSE by **0.2943 mm/day** with a paired-bootstrap 95% interval of **0.1551 to 0.4385 mm/day improvement**, but it significantly degraded overall RMSE, MAE and absolute bias.
+
+Therefore:
+
+- **Regime correction remains the primary forecast.**
+- Observation confidence is published as a separate reliability layer.
+- Selective trust rainfall is retained only as an experimental coastal-orographic diagnostic.
+- Negative results are reported to prevent an unsupported experimental blend from being presented as an operational improvement.
+
+---
+
 # 🗺️ Dashboard Features
 
 The Streamlit dashboard provides:
@@ -382,10 +510,17 @@ The Streamlit dashboard provides:
 - Regime-corrected rainfall layer
 - Observed IMERG rainfall layer
 - Heavy-rain probability layer
+- Observation-confidence layer
+- Low-confidence grid-cell fraction layer
+- Observation-reliability signal layer
+- Dominant geographic-regime layer
+- Experimental selective-trust rainfall layer
 - District search
 - District-level forecast ranking
+- Highest observation-disagreement district ranking
 - Experimental heavy-rain watch categories
-- Model verification summaries
+- Date-specific reliability summaries
+- Study-wide RAIN-Trust findings and limitations
 - CSV forecast download
 
 Available prototype dates:
@@ -397,6 +532,8 @@ Available prototype dates:
 2018-07-30
 2018-07-31
 ```
+
+These five dates form the district-level deployment demonstration. The research findings panel summarizes the full 1–31 July evaluation and therefore remains constant when the selected dashboard date changes. Date-specific maps, metrics, rankings and tables change with the selected date.
 
 ---
 
@@ -411,15 +548,23 @@ monsoon-postprocessing/
 ├── data/
 │   ├── raw/
 │   │   ├── gefs/
-│   │   └── imerg/
+│   │   ├── imerg/
+│   │   ├── imd/
+│   │   └── dem/
 │   │
 │   └── processed/
 │       ├── india_districts_simplified.geojson
 │       ├── district_rainfall_forecast_20180727_20180731.csv
+│       ├── district_rainfall_forecast_trust_20180727_20180731.csv
+│       ├── complete_grid_district_lookup.csv
 │       ├── july2018_gefs_imerg.nc
 │       ├── july2018_model_dataset.nc
 │       ├── july2018_regime_labeled_dataset.nc
 │       ├── july2018_regime_correction_predictions.nc
+│       ├── july2018_imerg_imd_validation.nc
+│       ├── india_terrain_features.nc
+│       ├── july2018_observation_reliability.nc
+│       ├── observation_reliability_bootstrap.csv
 │       ├── heavy_rain_probability_test.nc
 │       └── verification metric files
 │
@@ -619,6 +764,8 @@ Create the required directories after cloning the repository.
 ```powershell
 New-Item -ItemType Directory -Force data\raw\gefs
 New-Item -ItemType Directory -Force data\raw\imerg
+New-Item -ItemType Directory -Force data\raw\imd
+New-Item -ItemType Directory -Force data\raw\dem
 New-Item -ItemType Directory -Force data\processed
 New-Item -ItemType Directory -Force models
 New-Item -ItemType Directory -Force outputs
@@ -629,6 +776,8 @@ New-Item -ItemType Directory -Force outputs
 ```bash
 mkdir -p data/raw/gefs
 mkdir -p data/raw/imerg
+mkdir -p data/raw/imd
+mkdir -p data/raw/dem
 mkdir -p data/processed
 mkdir -p models
 mkdir -p outputs
@@ -638,6 +787,8 @@ Place:
 
 - GEFS GRIB2 files inside `data/raw/gefs/`
 - IMERG NetCDF files inside `data/raw/imerg/`
+- IMD daily gridded rainfall inside `data/raw/imd/`
+- Extracted SRTM terrain data inside `data/raw/dem/`
 
 ---
 
@@ -661,8 +812,13 @@ The full research pipeline should be executed in the following order:
 | 12 | Apply regime-aware correction |
 | 13 | Train heavy-rain probability models |
 | 14 | Produce district-level forecasts |
-| 15 | Generate deployment files |
-| 16 | Run the Streamlit dashboard |
+| 15 | Integrate IMD and validate IMERG observations |
+| 16 | Derive terrain and coastline features |
+| 17 | Train and validate the RAIN-Trust reliability model |
+| 18 | Run sensitivity and bootstrap analyses |
+| 19 | Test and document trust-weighted correction experiments |
+| 20 | Generate trust-enabled district deployment files |
+| 21 | Run the Streamlit dashboard |
 
 Important final notebook:
 
@@ -686,10 +842,12 @@ The application expects these deployment files:
 
 ```text
 data/processed/india_districts_simplified.geojson
-data/processed/district_rainfall_forecast_20180727_20180731.csv
+data/processed/district_rainfall_forecast_trust_20180727_20180731.csv
 ```
 
-If either file is missing, execute the deployment-data preparation notebook before starting the dashboard.
+The dashboard prefers the trust-enabled CSV. For backward compatibility, it can fall back to `district_regime_corrected_forecast_20180727_20180731.csv` or `district_rainfall_forecast_20180727_20180731.csv`, but observation-reliability layers are unavailable in legacy mode.
+
+If the boundary file or every supported forecast CSV is missing, execute the deployment-data preparation notebook before starting the dashboard.
 
 ---
 
@@ -729,12 +887,28 @@ Check that:
 
 - All five dates are available.
 - Every map layer loads.
+- Observation-confidence, reliability-signal and geographic-regime layers load when the trust CSV is present.
 - District names appear correctly.
 - Hover information works.
 - Metrics change with the selected date.
 - The district table is populated.
 - CSV download works.
+- The scope notice distinguishes the 31-day study from the five-day dashboard.
+- Study-wide findings remain fixed while date-specific reliability metrics change.
 - The mobile layout remains readable.
+
+## Local smoke-test sequence
+
+From the repository root in the activated environment:
+
+```powershell
+python -m pip check
+python -m py_compile dashboard\app.py
+python -c "import geopandas, pandas, plotly, streamlit; print('Dashboard imports passed')"
+streamlit run dashboard/app.py
+```
+
+Then verify all five dates, every available map layer, hover values, district counts, both diagnostic tables and CSV download. A successful syntax/import check does not replace this browser-level test.
 
 ---
 
@@ -742,6 +916,7 @@ Check that:
 
 - Only July 2018 is included.
 - The dataset contains only 31 forecast dates.
+- The dashboard packages only 27–31 July 2018; this is a deployment subset, not a separate independent test set.
 - The system does not represent multiple monsoon seasons.
 - GEFS resolution is approximately 0.25°, not true district-scale resolution.
 - Prototype regime labels are partly derived from rainfall observations.
@@ -751,6 +926,9 @@ Check that:
 - Heavy-rain probability produces a high false-alarm ratio.
 - Very-heavy-rain Brier skill is currently below climatology.
 - Regime-aware correction only slightly outperforms global correction.
+- RAIN-Trust measures agreement between IMERG and IMD; it is not a calibrated probability that either observation or the forecast is correct.
+- Coastal-orographic reliability results use fewer samples than the other geographic regimes.
+- Direct trust blending did not improve overall forecast performance.
 - The prototype does not currently provide an operational real-time ingestion pipeline.
 - Dashboard risk categories are experimental and are not official warnings.
 
@@ -763,8 +941,8 @@ Check that:
 - Add at least 5–10 monsoon seasons.
 - Include multiple active, break and depression events.
 - Use higher-resolution rainfall observations.
-- Add IMD observations where access permits.
-- Include terrain elevation and distance from the coast.
+- Extend the IMD–IMERG reliability study across multiple monsoon seasons.
+- Test additional elevation, exposure, coastline-orientation and rain-gauge-density features.
 - Include full GEFS ensemble members.
 
 ## Regime-classification improvements
@@ -812,6 +990,8 @@ This project uses data or derived products from:
 
 - NOAA Global Ensemble Forecast System Version 12 Reforecast
 - NASA GPM IMERG Final precipitation
+- India Meteorological Department 0.25° daily gridded rainfall
+- NASA SRTMGL30 elevation
 - geoBoundaries administrative boundary data
 
 Users must review and follow the licences, terms of use and attribution requirements of each original data provider before redistributing source or derived data.
@@ -850,9 +1030,13 @@ Heavy-rain probability estimation
         ↓
 Forecast verification
         ↓
+IMERG–IMD reliability validation
+        ↓
+Terrain and coastline analysis
+        ↓
 District-level aggregation
         ↓
 Interactive GIS visualization
 ```
 
-The next development phase is to expand the training dataset, improve rare-event performance and convert the offline research pipeline into an automated forecasting service.
+The completed MVP keeps regime correction as the primary forecast and publishes RAIN-Trust confidence as a separate diagnostic layer. The next development phase is to expand the analysis across multiple monsoon seasons, improve rare-event performance and convert the offline research pipeline into an automated forecasting service.

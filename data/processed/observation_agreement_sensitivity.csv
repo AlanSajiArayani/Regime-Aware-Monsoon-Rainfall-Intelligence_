@@ -1,0 +1,13 @@
+stabilization_floor_mm,geographic_regime_code,geographic_regime,dates,mean_agreement_score,daily_score_std,agreement_rank,difference_vs_interior_plain
+2.0,0,Interior plain,31,0.6020351,0.06837714,1,0.0
+2.0,1,Coastal plain,31,0.58531994,0.07183605,2,-0.016715169
+2.0,2,Interior orographic,31,0.57586545,0.048679955,3,-0.026169658
+2.0,3,Coastal orographic,31,0.51969725,0.057797838,4,-0.08233786
+5.0,0,Interior plain,31,0.67998177,0.060625624,1,0.0
+5.0,1,Coastal plain,31,0.6609916,0.07035267,3,-0.018990159
+5.0,2,Interior orographic,31,0.665607,0.046485186,2,-0.014374793
+5.0,3,Coastal orographic,31,0.5871047,0.06397755,4,-0.09287709
+10.0,0,Interior plain,31,0.7453972,0.051406406,1,0.0
+10.0,1,Coastal plain,31,0.7247127,0.06572632,3,-0.02068448
+10.0,2,Interior orographic,31,0.7379798,0.041416448,2,-0.007417381
+10.0,3,Coastal orographic,31,0.6500604,0.06769135,4,-0.095336795

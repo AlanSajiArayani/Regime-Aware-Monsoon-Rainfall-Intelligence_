@@ -23,11 +23,34 @@ BOUNDARY_FILE = (
     / "india_districts_simplified.geojson"
 )
 
-FORECAST_FILE = (
-    PROJECT_ROOT
-    / "data"
-    / "processed"
-    / "district_regime_corrected_forecast_20180727_20180731.csv"
+FORECAST_CANDIDATES = [
+    (
+        PROJECT_ROOT
+        / "data"
+        / "processed"
+        / "district_rainfall_forecast_trust_20180727_20180731.csv"
+    ),
+    (
+        PROJECT_ROOT
+        / "data"
+        / "processed"
+        / "district_regime_corrected_forecast_20180727_20180731.csv"
+    ),
+    (
+        PROJECT_ROOT
+        / "data"
+        / "processed"
+        / "district_rainfall_forecast_20180727_20180731.csv"
+    ),
+]
+
+FORECAST_FILE = next(
+    (
+        candidate
+        for candidate in FORECAST_CANDIDATES
+        if candidate.exists()
+    ),
+    FORECAST_CANDIDATES[0],
 )
 
 
@@ -39,7 +62,13 @@ if not BOUNDARY_FILE.exists():
 
 if not FORECAST_FILE.exists():
     st.error(
-        f"Forecast file not found:\n{FORECAST_FILE}"
+        "No supported forecast file was found. "
+        "Generate the Stage 6A trust dataset or the legacy "
+        "deployment dataset first. Checked:\n"
+        + "\n".join(
+            str(path)
+            for path in FORECAST_CANDIDATES
+        )
     )
     st.stop()
 
@@ -113,13 +142,74 @@ layer_settings = {
 }
 
 
+optional_layer_settings = {
+    "Observation confidence": {
+        "column": "observation_confidence_mean",
+        "label": "Observation confidence",
+        "scale": "RdYlGn",
+        "range": (0, 1),
+    },
+    "Low-confidence cell fraction": {
+        "column": "low_confidence_cell_fraction",
+        "label": "Low-confidence grid-cell fraction",
+        "scale": "YlOrRd",
+        "range": (0, 1),
+    },
+    "Observation reliability signal": {
+        "column": "observation_reliability_signal",
+        "label": "Observation reliability signal",
+        "kind": "categorical",
+        "colors": {
+            "Higher observation agreement": "#2ca25f",
+            "Mixed observation agreement": "#fec44f",
+            "Elevated observation disagreement": "#de2d26",
+        },
+    },
+    "Geographic regime": {
+        "column": "dominant_geographic_regime",
+        "label": "Dominant geographic regime",
+        "kind": "categorical",
+        "colors": {
+            "Interior plain": "#74a9cf",
+            "Coastal plain": "#2b8cbe",
+            "Interior orographic": "#a1d99b",
+            "Coastal orographic": "#31a354",
+        },
+    },
+    "Experimental selective-trust rainfall": {
+        "column": "selective_trust_raw_mean_mm",
+        "label": (
+            "Experimental selective-trust raw blend "
+            "(mm/day)"
+        ),
+        "scale": "Blues",
+        "range": (0, 150),
+    },
+}
+
+
+for layer_name, layer_config in (
+    optional_layer_settings.items()
+):
+    if layer_config["column"] in forecast_df.columns:
+        layer_settings[layer_name] = layer_config
+
+
+trust_columns_available = {
+    "observation_confidence_mean",
+    "low_confidence_cell_fraction",
+    "observation_reliability_signal",
+}.issubset(forecast_df.columns)
+
+
 st.title(
     "Regime-Aware Monsoon Rainfall Intelligence"
 )
 
 st.caption(
     "District-level prototype using GEFS forecasts, "
-    "IMERG observations and regime-aware AI correction."
+    "IMERG observations, independent IMD validation, "
+    "geographic context and regime-aware AI correction."
 )
 
 
@@ -149,6 +239,17 @@ with st.sidebar:
         "Research prototype only. Probability signals "
         "are not official weather warnings."
     )
+
+    if trust_columns_available:
+        st.success(
+            "RAIN-Trust reliability layers are available."
+        )
+    else:
+        st.info(
+            "Legacy forecast dataset loaded. Generate the "
+            "Stage 6A trust CSV to enable observation-"
+            "reliability layers."
+        )
 
 
 selected_attributes = forecast_df[
@@ -236,6 +337,48 @@ metric_4.metric(
 )
 
 
+if trust_columns_available:
+    elevated_count = int(
+        (
+            selected_data[
+                "observation_reliability_signal"
+            ]
+            == "Elevated observation disagreement"
+        ).sum()
+    )
+
+    mean_observation_confidence = float(
+        selected_data[
+            "observation_confidence_mean"
+        ].mean()
+    )
+
+    mean_low_confidence_fraction = float(
+        selected_data[
+            "low_confidence_cell_fraction"
+        ].mean()
+    )
+
+    trust_metric_1, trust_metric_2, trust_metric_3 = (
+        st.columns(3)
+    )
+
+    trust_metric_1.metric(
+        "Elevated-disagreement districts",
+        f"{elevated_count:,}",
+    )
+
+    trust_metric_2.metric(
+        "Mean observation confidence",
+        f"{mean_observation_confidence:.1%}",
+    )
+
+    trust_metric_3.metric(
+        "Mean low-confidence fraction",
+        f"{mean_low_confidence_fraction:.1%}",
+    )
+
+
 st.subheader("District forecast map")
 
 
@@ -270,58 +413,102 @@ with st.spinner("Preparing district map..."):
         .dt.strftime("%Y-%m-%d")
     )
 
-    figure = px.choropleth_map(
-        plot_data,
-        geojson=geojson_data,
-        locations="shapeID",
-        featureidkey="properties.shapeID",
-        color=map_column,
-        hover_name="shapeName",
-        hover_data={
-            "shapeID": False,
-            "date": True,
-            "gefs_mean_mm": ":.1f",
-            "global_corrected_mean_mm": ":.1f",
-            "regime_corrected_mean_mm": ":.1f",
-            "observed_mean_mm": ":.1f",
-            "heavy_probability_max": ":.1%",
-            "risk_level": True,
-        },
-        labels={
-            "date": "Date",
-            "gefs_mean_mm": "Raw GEFS (mm)",
-            "global_corrected_mean_mm": (
-                "Global corrected (mm)"
-            ),
-            "regime_corrected_mean_mm": (
-                "Regime corrected (mm)"
-            ),
-            "observed_mean_mm": (
-                "IMERG observed (mm)"
-            ),
-            "heavy_probability_max": (
-                "Heavy-rain probability"
-            ),
-            "risk_level": "Risk category",
-            map_column: settings["label"],
-        },
-        color_continuous_scale=(
-            settings["scale"]
+    hover_formats = {
+        "shapeID": False,
+        "date": True,
+        "gefs_mean_mm": ":.1f",
+        "global_corrected_mean_mm": ":.1f",
+        "regime_corrected_mean_mm": ":.1f",
+        "observed_mean_mm": ":.1f",
+        "heavy_probability_max": ":.1%",
+        "risk_level": True,
+        "observation_confidence_mean": ":.1%",
+        "low_confidence_cell_fraction": ":.1%",
+        "low_confidence_risk_mean": ":.1%",
+        "observation_reliability_signal": True,
+        "dominant_geographic_regime": True,
+        "selective_trust_raw_mean_mm": ":.1f",
+        "selective_adjustment_mean_mm": ":.1f",
+    }
+
+    hover_data = {
+        column: value
+        for column, value in hover_formats.items()
+        if column in plot_data.columns
+    }
+
+    labels = {
+        "date": "Date",
+        "gefs_mean_mm": "Raw GEFS (mm)",
+        "global_corrected_mean_mm": (
+            "Global corrected (mm)"
         ),
-        range_color=settings["range"],
-        center={
+        "regime_corrected_mean_mm": (
+            "Regime corrected (mm)"
+        ),
+        "observed_mean_mm": "IMERG observed (mm)",
+        "heavy_probability_max": (
+            "Heavy-rain probability"
+        ),
+        "risk_level": "Risk category",
+        "observation_confidence_mean": (
+            "Observation confidence"
+        ),
+        "low_confidence_cell_fraction": (
+            "Low-confidence cell fraction"
+        ),
+        "low_confidence_risk_mean": (
+            "Low-confidence risk"
+        ),
+        "observation_reliability_signal": (
+            "Reliability signal"
+        ),
+        "dominant_geographic_regime": (
+            "Geographic regime"
+        ),
+        "selective_trust_raw_mean_mm": (
+            "Experimental selective trust (mm)"
+        ),
+        "selective_adjustment_mean_mm": (
+            "Experimental adjustment (mm)"
+        ),
+        map_column: settings["label"],
+    }
+
+    map_arguments = {
+        "data_frame": plot_data,
+        "geojson": geojson_data,
+        "locations": "shapeID",
+        "featureidkey": "properties.shapeID",
+        "color": map_column,
+        "hover_name": "shapeName",
+        "hover_data": hover_data,
+        "labels": labels,
+        "center": {
             "lat": 22.5,
             "lon": 79.0,
         },
-        zoom=3.3,
-        opacity=0.80,
-        map_style="carto-positron",
-        title=(
+        "zoom": 3.3,
+        "opacity": 0.80,
+        "map_style": "carto-positron",
+        "title": (
             f"{selected_layer} — "
             f"{selected_date:%d %B %Y}"
         ),
-        height=720,
-    )
+        "height": 720,
+    }
+
+    if settings.get("kind") == "categorical":
+        map_arguments["color_discrete_map"] = (
+            settings["colors"]
+        )
+    else:
+        map_arguments["color_continuous_scale"] = (
+            settings["scale"]
+        )
+        map_arguments["range_color"] = settings["range"]
+
+    figure = px.choropleth_map(**map_arguments)
 
     figure.update_traces(
         marker_line_width=0.25,
@@ -499,19 +686,176 @@ with right_column:
     )
 
 
+if trust_columns_available:
+    st.subheader("Observation reliability diagnostics")
+
+    st.caption(
+        "These diagnostics compare independent IMERG and "
+        "IMD rainfall products. Elevated disagreement means "
+        "the observational reference is less certain; it is "
+        "not an official warning and does not by itself prove "
+        "that the forecast is incorrect."
+    )
+
+    reliability_left, reliability_right = st.columns(
+        [1, 2]
+    )
+
+    with reliability_left:
+        reliability_summary = (
+            selected_data.groupby(
+                "observation_reliability_signal",
+                dropna=False,
+            )
+            .agg(
+                Districts=("shapeID", "nunique"),
+                **{
+                    "Mean confidence": (
+                        "observation_confidence_mean",
+                        "mean",
+                    ),
+                    "Mean low-confidence fraction": (
+                        "low_confidence_cell_fraction",
+                        "mean",
+                    ),
+                },
+            )
+            .reset_index()
+            .rename(
+                columns={
+                    "observation_reliability_signal": (
+                        "Reliability signal"
+                    )
+                }
+            )
+        )
+
+        st.markdown("**Districts by reliability signal**")
+        st.dataframe(
+            reliability_summary,
+            width="stretch",
+            hide_index=True,
+            column_config={
+                "Mean confidence": (
+                    st.column_config.NumberColumn(
+                        format="percent"
+                    )
+                ),
+                "Mean low-confidence fraction": (
+                    st.column_config.NumberColumn(
+                        format="percent"
+                    )
+                ),
+            },
+        )
+
+    with reliability_right:
+        reliability_columns = [
+            "shapeName",
+            "observation_confidence_mean",
+            "low_confidence_cell_fraction",
+            "observation_reliability_signal",
+        ]
+
+        for optional_column in [
+            "low_confidence_risk_mean",
+            "selective_adjustment_mean_mm",
+            "dominant_geographic_regime",
+        ]:
+            if optional_column in selected_data.columns:
+                reliability_columns.append(optional_column)
+
+        lowest_confidence = (
+            selected_data[reliability_columns]
+            .sort_values(
+                [
+                    "low_confidence_cell_fraction",
+                    "observation_confidence_mean",
+                ],
+                ascending=[False, True],
+            )
+            .head(15)
+            .rename(
+                columns={
+                    "shapeName": "District",
+                    "observation_confidence_mean": (
+                        "Observation confidence"
+                    ),
+                    "low_confidence_cell_fraction": (
+                        "Low-confidence fraction"
+                    ),
+                    "low_confidence_risk_mean": (
+                        "Low-confidence risk"
+                    ),
+                    "observation_reliability_signal": (
+                        "Reliability signal"
+                    ),
+                    "selective_adjustment_mean_mm": (
+                        "Experimental adjustment (mm)"
+                    ),
+                    "dominant_geographic_regime": (
+                        "Geographic regime"
+                    ),
+                }
+            )
+        )
+
+        st.markdown("**Highest observation-disagreement districts**")
+        st.dataframe(
+            lowest_confidence,
+            width="stretch",
+            hide_index=True,
+            column_config={
+                "Observation confidence": (
+                    st.column_config.NumberColumn(
+                        format="percent"
+                    )
+                ),
+                "Low-confidence fraction": (
+                    st.column_config.NumberColumn(
+                        format="percent"
+                    )
+                ),
+                "Low-confidence risk": (
+                    st.column_config.NumberColumn(
+                        format="percent"
+                    )
+                ),
+                "Experimental adjustment (mm)": (
+                    st.column_config.NumberColumn(
+                        format="%.1f"
+                    )
+                ),
+            },
+        )
+
+
 st.subheader("District forecast table")
 
+forecast_table_columns = [
+    "shapeName",
+    "gefs_mean_mm",
+    "global_corrected_mean_mm",
+    "regime_corrected_mean_mm",
+    "observed_mean_mm",
+    "heavy_probability_max",
+    "very_heavy_probability_max",
+    "risk_level",
+]
+
+for optional_column in [
+    "observation_confidence_mean",
+    "low_confidence_cell_fraction",
+    "observation_reliability_signal",
+    "dominant_geographic_regime",
+    "selective_trust_raw_mean_mm",
+    "selective_adjustment_mean_mm",
+]:
+    if optional_column in selected_data.columns:
+        forecast_table_columns.append(optional_column)
+
 forecast_table = selected_data[
-    [
-        "shapeName",
-        "gefs_mean_mm",
-        "global_corrected_mean_mm",
-        "regime_corrected_mean_mm",
-        "observed_mean_mm",
-        "heavy_probability_max",
-        "very_heavy_probability_max",
-        "risk_level",
-    ]
+    forecast_table_columns
 ].copy()
 
 forecast_table[
@@ -521,6 +865,13 @@ forecast_table[
 forecast_table[
     "very_heavy_probability_max"
 ] *= 100
+
+for percentage_column in [
+    "observation_confidence_mean",
+    "low_confidence_cell_fraction",
+]:
+    if percentage_column in forecast_table.columns:
+        forecast_table[percentage_column] *= 100
 
 forecast_table = forecast_table.rename(
     columns={
@@ -542,6 +893,24 @@ forecast_table = forecast_table.rename(
             "Very-heavy probability (%)"
         ),
         "risk_level": "Signal",
+        "observation_confidence_mean": (
+            "Observation confidence (%)"
+        ),
+        "low_confidence_cell_fraction": (
+            "Low-confidence fraction (%)"
+        ),
+        "observation_reliability_signal": (
+            "Observation reliability"
+        ),
+        "dominant_geographic_regime": (
+            "Geographic regime"
+        ),
+        "selective_trust_raw_mean_mm": (
+            "Experimental selective trust (mm)"
+        ),
+        "selective_adjustment_mean_mm": (
+            "Experimental adjustment (mm)"
+        ),
     }
 )
 
@@ -550,10 +919,37 @@ forecast_table = forecast_table.sort_values(
     ascending=False,
 )
 
+forecast_column_config = {}
+
+for percentage_column in [
+    "Observation confidence (%)",
+    "Low-confidence fraction (%)",
+]:
+    if percentage_column in forecast_table.columns:
+        forecast_column_config[percentage_column] = (
+            st.column_config.ProgressColumn(
+                min_value=0,
+                max_value=100,
+                format="%.1f%%",
+            )
+        )
+
+for rainfall_column in [
+    "Experimental selective trust (mm)",
+    "Experimental adjustment (mm)",
+]:
+    if rainfall_column in forecast_table.columns:
+        forecast_column_config[rainfall_column] = (
+            st.column_config.NumberColumn(
+                format="%.1f"
+            )
+        )
+
 st.dataframe(
     forecast_table,
     width="stretch",
     hide_index=True,
+    column_config=forecast_column_config,
 )
 
 
@@ -572,6 +968,22 @@ st.download_button(
 )
 
 
+if trust_columns_available:
+    with st.expander(
+        "RAIN-Trust research findings"
+    ):
+        st.markdown(
+            """
+- **Observation reliability is geographically structured.** Independent IMERG–IMD disagreement was highest in the coastal-orographic regime.
+- At the selected stabilization floor, coastal-orographic agreement was **0.0929 lower** than the interior-plain reference; its 95% bootstrap interval was **−0.1151 to −0.0702**.
+- A model using rainfall intensity plus geographic features improved spatial-block cross-validation MAE from **0.17596 to 0.16803** and R² from **0.33013 to 0.34375**.
+- **Regime correction remains the primary forecast.** Direct trust blending did not improve performance across India.
+- Selective raw blending is retained only as an **experimental coastal-orographic diagnostic**. It improved daily coastal-orographic RMSE by **0.2943 mm/day** in paired bootstrap evaluation, but degraded overall performance.
+- The confidence layer describes agreement between two observation products. It is not a calibrated probability that either product—or the forecast—is correct.
+            """
+        )
+
+
 with st.expander(
     "Model verification and limitations"
 ):
@@ -585,6 +997,9 @@ with st.expander(
 - Heavy-rain POD: **0.2074**
 - Heavy-rain FAR: **0.8521**
 - The current prototype is trained and evaluated using July 2018 data.
+- IMD and IMERG are independent observation products; neither is treated as perfect ground truth.
+- Observation confidence and geographic reliability results are prototype evidence, not a climatology.
+- Regime correction is the default forecast layer. Selective-trust rainfall is experimental and must not replace it operationally.
 - Very-heavy rainfall probabilities are experimental.
 - Bias correction improves rainfall magnitude but does not fully correct spatial displacement.
 - The dashboard does not provide official operational warnings.
