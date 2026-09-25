@@ -16,30 +16,67 @@ st.set_page_config(
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
-GEOJSON_FILE = (
+BOUNDARY_FILE = (
     PROJECT_ROOT
     / "data"
     / "processed"
-    / "district_regime_corrected_forecast.geojson"
+    / "india_districts_simplified.geojson"
 )
+
+FORECAST_FILE = (
+    PROJECT_ROOT
+    / "data"
+    / "processed"
+    / "district_regime_corrected_forecast_20180727_20180731.csv"
+)
+
+
+if not BOUNDARY_FILE.exists():
+    st.error(
+        f"District boundary file not found:\n{BOUNDARY_FILE}"
+    )
+    st.stop()
+
+if not FORECAST_FILE.exists():
+    st.error(
+        f"Forecast file not found:\n{FORECAST_FILE}"
+    )
+    st.stop()
 
 
 @st.cache_data
 def load_forecast_data():
-    forecast = gpd.read_file(GEOJSON_FILE)
+    boundaries = gpd.read_file(
+        BOUNDARY_FILE
+    )
 
-    forecast["date"] = pd.to_datetime(
-        forecast["date"]
+    forecast = pd.read_csv(
+        FORECAST_FILE,
+        parse_dates=["date"],
+    )
+
+    boundaries["shapeID"] = (
+        boundaries["shapeID"].astype(str)
     )
 
     forecast["shapeID"] = (
         forecast["shapeID"].astype(str)
     )
 
-    return forecast
+    boundaries = boundaries[
+        [
+            "shapeID",
+            "shapeName",
+            "geometry",
+        ]
+    ].copy()
+
+    return boundaries, forecast
 
 
-forecast_gdf = load_forecast_data()
+districts_gdf, forecast_df = (
+    load_forecast_data()
+)
 
 
 layer_settings = {
@@ -76,7 +113,9 @@ layer_settings = {
 }
 
 
-st.title("Regime-Aware Monsoon Rainfall Intelligence")
+st.title(
+    "Regime-Aware Monsoon Rainfall Intelligence"
+)
 
 st.caption(
     "District-level prototype using GEFS forecasts, "
@@ -85,8 +124,9 @@ st.caption(
 
 
 available_dates = sorted(
-    forecast_gdf["date"].dt.date.unique()
+    forecast_df["date"].dt.date.unique()
 )
+
 
 with st.sidebar:
     st.header("Forecast controls")
@@ -99,7 +139,7 @@ with st.sidebar:
 
     selected_layer = st.selectbox(
         "Map layer",
-        list(layer_settings),
+        list(layer_settings.keys()),
         index=2,
     )
 
@@ -111,9 +151,31 @@ with st.sidebar:
     )
 
 
-selected_data = forecast_gdf[
-    forecast_gdf["date"].dt.date == selected_date
+selected_attributes = forecast_df[
+    forecast_df["date"].dt.date
+    == selected_date
 ].copy()
+
+selected_attributes = selected_attributes.drop(
+    columns=["shapeName"],
+    errors="ignore",
+)
+
+selected_data = districts_gdf.merge(
+    selected_attributes,
+    on="shapeID",
+    how="inner",
+    validate="one_to_one",
+)
+
+
+if selected_data.empty:
+    st.error(
+        "No district forecast data are available "
+        "for the selected date."
+    )
+    st.stop()
+
 
 settings = layer_settings[selected_layer]
 map_column = settings["column"]
@@ -126,20 +188,28 @@ watch_count = int(
     ).sum()
 )
 
-maximum_probability = selected_data[
-    "heavy_probability_max"
-].max()
+maximum_probability = float(
+    selected_data[
+        "heavy_probability_max"
+    ].max()
+)
 
-average_raw = selected_data[
-    "gefs_mean_mm"
-].mean()
+average_raw = float(
+    selected_data[
+        "gefs_mean_mm"
+    ].mean()
+)
 
-average_corrected = selected_data[
-    "regime_corrected_mean_mm"
-].mean()
+average_corrected = float(
+    selected_data[
+        "regime_corrected_mean_mm"
+    ].mean()
+)
 
 
-metric_1, metric_2, metric_3, metric_4 = st.columns(4)
+metric_1, metric_2, metric_3, metric_4 = (
+    st.columns(4)
+)
 
 metric_1.metric(
     "Districts",
@@ -159,17 +229,15 @@ metric_3.metric(
 metric_4.metric(
     "Average corrected rainfall",
     f"{average_corrected:.1f} mm",
-    delta=f"{average_corrected - average_raw:.1f} mm",
+    delta=(
+        f"{average_corrected - average_raw:.1f} mm"
+    ),
     delta_color="off",
 )
 
 
-map_geometry = selected_data[
-    [
-        "shapeID",
-        "geometry",
-    ]
-].copy()
+st.subheader("District forecast map")
+
 
 with st.spinner("Preparing district map..."):
     map_geometry = selected_data[
@@ -183,17 +251,8 @@ with st.spinner("Preparing district map..."):
         map_geometry["shapeID"].astype(str)
     )
 
-    map_geometry["geometry"] = (
-        map_geometry.geometry.simplify(
-            tolerance=0.02,
-            preserve_topology=True,
-        )
-    )
-
     geojson_data = json.loads(
-        map_geometry.to_json(
-            drop_id=True
-        )
+        map_geometry.to_json()
     )
 
     plot_data = pd.DataFrame(
@@ -237,21 +296,25 @@ with st.spinner("Preparing district map..."):
             "regime_corrected_mean_mm": (
                 "Regime corrected (mm)"
             ),
-            "observed_mean_mm": "IMERG observed (mm)",
+            "observed_mean_mm": (
+                "IMERG observed (mm)"
+            ),
             "heavy_probability_max": (
                 "Heavy-rain probability"
             ),
             "risk_level": "Risk category",
             map_column: settings["label"],
         },
-        color_continuous_scale=settings["scale"],
+        color_continuous_scale=(
+            settings["scale"]
+        ),
         range_color=settings["range"],
         center={
             "lat": 22.5,
             "lon": 79.0,
         },
         zoom=3.3,
-        opacity=0.8,
+        opacity=0.80,
         map_style="carto-positron",
         title=(
             f"{selected_layer} — "
@@ -274,6 +337,7 @@ with st.spinner("Preparing district map..."):
         },
     )
 
+
 st.plotly_chart(
     figure,
     width="stretch",
@@ -285,10 +349,15 @@ st.plotly_chart(
 )
 
 
-left_column, right_column = st.columns([1, 1])
+left_column, right_column = st.columns(
+    [1, 1]
+)
+
 
 with left_column:
-    st.subheader("Highest heavy-rain signals")
+    st.subheader(
+        "Highest heavy-rain signals"
+    )
 
     highest_risk = (
         selected_data[
@@ -305,21 +374,36 @@ with left_column:
             ascending=False,
         )
         .head(10)
-        .rename(
-            columns={
-                "shapeName": "District",
-                "regime_corrected_mean_mm": (
-                    "Corrected rainfall (mm)"
-                ),
-                "observed_mean_mm": (
-                    "Observed rainfall (mm)"
-                ),
-                "heavy_probability_max": (
-                    "Heavy probability"
-                ),
-                "risk_level": "Signal",
-            }
-        )
+        .copy()
+    )
+
+    highest_risk[
+        "heavy_probability_percent"
+    ] = (
+        highest_risk[
+            "heavy_probability_max"
+        ]
+        * 100
+    )
+
+    highest_risk = highest_risk.drop(
+        columns=["heavy_probability_max"]
+    )
+
+    highest_risk = highest_risk.rename(
+        columns={
+            "shapeName": "District",
+            "regime_corrected_mean_mm": (
+                "Corrected rainfall (mm)"
+            ),
+            "observed_mean_mm": (
+                "Observed rainfall (mm)"
+            ),
+            "heavy_probability_percent": (
+                "Heavy probability (%)"
+            ),
+            "risk_level": "Signal",
+        }
     )
 
     st.dataframe(
@@ -337,11 +421,11 @@ with left_column:
                     format="%.1f"
                 )
             ),
-            "Heavy probability": (
+            "Heavy probability (%)": (
                 st.column_config.ProgressColumn(
                     min_value=0,
-                    max_value=1,
-                    format="%.1%%",
+                    max_value=100,
+                    format="%.1f%%",
                 )
             ),
         },
@@ -349,7 +433,9 @@ with left_column:
 
 
 with right_column:
-    st.subheader("Forecast comparison")
+    st.subheader(
+        "Forecast comparison"
+    )
 
     comparison = (
         selected_data[
@@ -370,7 +456,9 @@ with right_column:
                 "regime_corrected_mean_mm": (
                     "Regime corrected"
                 ),
-                "observed_mean_mm": "IMERG observed",
+                "observed_mean_mm": (
+                    "IMERG observed"
+                ),
             }
         )
         .reset_index()
@@ -397,6 +485,12 @@ with right_column:
     comparison_figure.update_layout(
         showlegend=False,
         height=420,
+        margin={
+            "l": 0,
+            "r": 0,
+            "t": 20,
+            "b": 0,
+        },
     )
 
     st.plotly_chart(
@@ -405,7 +499,82 @@ with right_column:
     )
 
 
-with st.expander("Model verification and limitations"):
+st.subheader("District forecast table")
+
+forecast_table = selected_data[
+    [
+        "shapeName",
+        "gefs_mean_mm",
+        "global_corrected_mean_mm",
+        "regime_corrected_mean_mm",
+        "observed_mean_mm",
+        "heavy_probability_max",
+        "very_heavy_probability_max",
+        "risk_level",
+    ]
+].copy()
+
+forecast_table[
+    "heavy_probability_max"
+] *= 100
+
+forecast_table[
+    "very_heavy_probability_max"
+] *= 100
+
+forecast_table = forecast_table.rename(
+    columns={
+        "shapeName": "District",
+        "gefs_mean_mm": "Raw GEFS (mm)",
+        "global_corrected_mean_mm": (
+            "Global corrected (mm)"
+        ),
+        "regime_corrected_mean_mm": (
+            "Regime corrected (mm)"
+        ),
+        "observed_mean_mm": (
+            "IMERG observed (mm)"
+        ),
+        "heavy_probability_max": (
+            "Heavy probability (%)"
+        ),
+        "very_heavy_probability_max": (
+            "Very-heavy probability (%)"
+        ),
+        "risk_level": "Signal",
+    }
+)
+
+forecast_table = forecast_table.sort_values(
+    "Heavy probability (%)",
+    ascending=False,
+)
+
+st.dataframe(
+    forecast_table,
+    width="stretch",
+    hide_index=True,
+)
+
+
+download_csv = forecast_table.to_csv(
+    index=False
+).encode("utf-8")
+
+st.download_button(
+    label="Download selected district forecast",
+    data=download_csv,
+    file_name=(
+        f"district_forecast_"
+        f"{selected_date:%Y%m%d}.csv"
+    ),
+    mime="text/csv",
+)
+
+
+with st.expander(
+    "Model verification and limitations"
+):
     st.markdown(
         """
 - Regime-classifier balanced accuracy: **0.6089**
@@ -415,8 +584,9 @@ with st.expander("Model verification and limitations"):
 - Heavy-rain CSI: **0.0945**
 - Heavy-rain POD: **0.2074**
 - Heavy-rain FAR: **0.8521**
-- Training period is limited to July 2018.
+- The current prototype is trained and evaluated using July 2018 data.
 - Very-heavy rainfall probabilities are experimental.
 - Bias correction improves rainfall magnitude but does not fully correct spatial displacement.
+- The dashboard does not provide official operational warnings.
         """
     )

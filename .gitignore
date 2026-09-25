@@ -1,21 +1,31 @@
+# Python environments and cache
 .venv/
 venv/
-env/
-
 __pycache__/
-*.pyc
+*.py[cod]
 .ipynb_checkpoints/
 
+# Credentials and local configuration
 .env
-.env.local
+.env.*
+.streamlit/secrets.toml
 
+# Raw meteorological data
+data/raw/
 *.grib
 *.grib2
-*.grb
-*.grb2
+*.idx
+
+# Large processed scientific data
+# NetCDF scientific datasets
 *.nc
 *.nc4
-*.parquet
 
-data/raw/
-downloads/data/processed/district_regime_corrected_forecast.geojson
+# Repeated-geometry file replaced by deployment files
+data/processed/district_regime_corrected_forecast.geojson
+
+# Temporary files
+*.tmp
+*.log
+.DS_Store
+Thumbs.db
